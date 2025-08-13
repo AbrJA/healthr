@@ -12,10 +12,10 @@ Metric <- R6::R6Class(
       checkmate::assertDataTable(dt)
       checkmate::assertDataTable(validator)
       checkmate::assertInteger(sequence, len = nrow(validator))
-      dt[, date := as.POSIXct(date)]
-      data.table::setorder(dt, date)
-      dt[, day := .GRP - 1L, by = .(data.table::yday(date))]
-      dt[, period := 1440L * day + 60L * data.table::hour(date) + data.table::minute(date)]
+      dt[, timestamp := as.POSIXct(timestamp)]
+      data.table::setorder(dt, timestamp)
+      dt[, day := .GRP - 1L, by = .(data.table::yday(timestamp))]
+      dt[, period := 1440L * day + 60L * data.table::hour(timestamp) + data.table::minute(timestamp)]
       dt[, day := NULL]
       validator <- data.table::copy(validator)
       validator[dt, value := i.value, on = .(period)]
