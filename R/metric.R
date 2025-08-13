@@ -8,7 +8,7 @@
 Metric <- R6::R6Class(
   classname = "Metric",
   public = list(
-    count = function(dt, validator, sequence) {
+    check = function(dt, validator, sequence) {
       checkmate::assertDataTable(dt)
       checkmate::assertDataTable(validator)
       checkmate::assertInteger(sequence, len = nrow(validator))
@@ -18,8 +18,8 @@ Metric <- R6::R6Class(
       dt[, period := 1440L * day + 60L * data.table::hour(date) + data.table::minute(date)]
       dt[, day := NULL]
       validator <- data.table::copy(validator)
-      validator[dt, count := i.count, on = .(period)]
-      private$.dt <- validator[, .(count = sum(count)), by = .(period = sequence)]
+      validator[dt, value := i.value, on = .(period)]
+      private$.dt <- validator[, .(value = sum(value)), by = .(period = sequence)]
       data.table::setkey(private$.dt, period)
       invisible(self)
     }
