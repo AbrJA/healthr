@@ -37,7 +37,6 @@ Model <- R6::R6Class(
       checkmate::assertInt(period, lower = 1L)
       checkmate::assertInt(level, lower = 80L, upper = 99L)
       checkmate::assertInt(k, lower = 1L, upper = 5L)
-      if (checkmate::testNull(private$.serie)) stop("Normalize the values first")
       if (checkmate::testNull(private$.model)) stop("Train the model first")
       fourier <- data.frame(values = forecast::fourier(private$.serie, K = k, h = period))
       linear <- forecast::forecast(private$.model, newdata = fourier, level = level)
