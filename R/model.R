@@ -13,16 +13,16 @@ Model <- R6::R6Class(
       checkmate::assertInteger(period, lower = 1L)
       private$.dt <- data.table::copy(dt)
       private$.dt[, group := period %% period]
-      index <- private$.dt[, .I[which.min(count)], by = .(group)]$V1
-      private$.dt[index, count := NA_integer_]
-      dt_stats <- private$.dt[, .(count = round(quantile(count, probs = 0.25, na.rm = TRUE))), by = .(group)]
-      private$.dt[is.na(count), count := dt_stats[.SD, count, on = .(group)]]
-      index <- private$.dt[, .I[which.max(count)], by = .(group)]$V1
-      private$.dt[index, count := NA_integer_]
-      dt_stats <- private$.dt[, .(count = round(quantile(count, probs = 0.75, na.rm = TRUE))), by = .(group)]
-      private$.dt[is.na(count), count := dt_stats[.SD, count, on = .(group)]]
+      index <- private$.dt[, .I[which.min(value)], by = .(group)]$V1
+      private$.dt[index, value := NA_integer_]
+      dt_stats <- private$.dt[, .(value = round(quantile(value, probs = 0.25, na.rm = TRUE))), by = .(group)]
+      private$.dt[is.na(value), value := dt_stats[.SD, value, on = .(group)]]
+      index <- private$.dt[, .I[which.max(value)], by = .(group)]$V1
+      private$.dt[index, value := NA_integer_]
+      dt_stats <- private$.dt[, .(value = round(quantile(value, probs = 0.75, na.rm = TRUE))), by = .(group)]
+      private$.dt[is.na(value), value := dt_stats[.SD, value, on = .(group)]]
       private$.dt[, group := NULL]
-      private$.serie <- stats::ts(private$.dt$count, start = c(1L, 1L), frequency = period)
+      private$.serie <- stats::ts(private$.dt$value, start = c(1L, 1L), frequency = period)
       invisible(self)
     },
     train = function(k = 4L) {
@@ -41,7 +41,7 @@ Model <- R6::R6Class(
       fourier <- data.frame(values = forecast::fourier(private$.serie, K = k, h = period))
       linear <- forecast::forecast(private$.model, newdata = fourier, level = level)
       private$.prediction <- sapply(c("lower", "mean", "upper"), function(x) {
-        values <- as.integer(linear[[x]])
+        values <- linear[[x]]
         values[values < 0] <- 0L
         values
       }, simplify = FALSE)
